@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Menu principal -->
+    <menuitem id="menu_gestion_suggestions_root"
+              name="Suggestions"
+              sequence="10"
+              web_icon="gestion_suggestions,static/description/icon.png"/>
+    
+    <!-- Section : Suggestions -->
+    <menuitem id="menu_suggestions_section"
+              name="Suggestions"
+              parent="menu_gestion_suggestions_root"
+              sequence="10"/>
+    
+    <!-- Sous-menu : Toutes les suggestions -->
+    <menuitem id="menu_suggestions_all"
+              name="Toutes les Suggestions"
+              parent="menu_suggestions_section"
+              action="action_suggestion"
+              sequence="10"/>
+    
+    <!-- Sous-menu : Mes suggestions -->
+    <menuitem id="menu_mes_suggestions"
+              name="Mes Suggestions"
+              parent="menu_suggestions_section"
+              action="action_mes_suggestions"
+              sequence="20"/>
+    
+    <!-- Sous-menu : Suggestions à traiter -->
+    <menuitem id="menu_suggestions_a_traiter"
+              name="À Traiter"
+              parent="menu_suggestions_section"
+              action="action_suggestions_a_traiter"
+              sequence="30"/>
+    
+    <!-- Sous-menu : Suggestions acceptées -->
+    <menuitem id="menu_suggestions_acceptees"
+              name="Suggestions Acceptées"
+              parent="menu_suggestions_section"
+              action="action_suggestions_acceptees"
+              sequence="40"/>
+    
+    <!-- Section : Rapports et Statistiques -->
+    <menuitem id="menu_rapports_section"
+              name="Rapports"
+              parent="menu_gestion_suggestions_root"
+              sequence="50"/>
+    
+    <!-- Sous-menu : Statistiques -->
+    <menuitem id="menu_statistiques"
+              name="Statistiques"
+              parent="menu_rapports_section"
+              action="action_suggestion_statistics"
+              sequence="10"/>
+    
+    <!-- Section : Configuration -->
+    <menuitem id="menu_configuration_section"
+              name="Configuration"
+              parent="menu_gestion_suggestions_root"
+              sequence="100"
+              groups="base.group_system"/>
+
+</odoo>

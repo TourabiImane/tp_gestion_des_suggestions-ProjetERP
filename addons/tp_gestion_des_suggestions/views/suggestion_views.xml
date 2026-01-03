@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire -->
+    <record id="view_suggestion_form" model="ir.ui.view">
+        <field name="name">gestion.suggestion.form</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <form string="Suggestion">
+                <header>
+                    <button name="action_soumettre" string="Soumettre" 
+                            type="object" class="oe_highlight"
+                            invisible="state != 'brouillon'"/>
+                    <button name="action_analyser" string="Analyser" 
+                            type="object" class="oe_highlight"
+                            invisible="state != 'soumis'"/>
+                    <button name="action_accepter" string="Accepter" 
+                            type="object" class="btn-success"
+                            invisible="state != 'en_cours'"/>
+                    <button name="action_refuser" string="Refuser" 
+                            type="object" class="btn-danger"
+                            invisible="state != 'en_cours'"/>
+                    <button name="action_realiser" string="Marquer comme réalisé" 
+                            type="object" class="oe_highlight"
+                            invisible="state != 'accepte'"/>
+                    <button name="action_retour_brouillon" string="Retour brouillon" 
+                            type="object"
+                            invisible="state not in ('soumis', 'en_cours')"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="brouillon,soumis,en_cours,accepte,realise"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Titre de la suggestion..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="auteur_id"/>
+                            <field name="responsable_id"/>
+                            <field name="date_creation"/>
+                            <field name="date_traitement"/>
+                        </group>
+                        <group>
+                            <field name="categorie"/>
+                            <field name="priorite" widget="badge"/>
+                            <field name="cout_estime"/>
+                            <field name="duree_traitement" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="description" nolabel="1" placeholder="Décrivez votre suggestion en détail..."/>
+                            </group>
+                        </page>
+                        <page string="Bénéfices">
+                            <group>
+                                <field name="benefice_estime" nolabel="1" 
+                                       placeholder="Quels sont les bénéfices attendus de cette suggestion ?"/>
+                            </group>
+                        </page>
+                        <page string="Traitement">
+                            <group>
+                                <field name="commentaire" nolabel="1" 
+                                       placeholder="Commentaires sur le traitement de la suggestion..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue arbre -->
+    <record id="view_suggestion_tree" model="ir.ui.view">
+        <field name="name">gestion.suggestion.tree</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <tree string="Suggestions" decoration-success="state == 'accepte'" 
+                  decoration-danger="state == 'refuse'" decoration-info="state == 'soumis'"
+                  decoration-muted="state == 'brouillon'">
+                <field name="name"/>
+                <field name="auteur_id"/>
+                <field name="responsable_id"/>
+                <field name="categorie"/>
+                <field name="priorite" widget="badge"/>
+                <field name="date_creation"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue kanban -->
+    <record id="view_suggestion_kanban" model="ir.ui.view">
+        <field name="name">gestion.suggestion.kanban</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="auteur_id"/>
+                <field name="priorite"/>
+                <field name="state"/>
+                <field name="categorie"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <span class="badge badge-pill">
+                                        <field name="priorite"/>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="categorie"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="auteur_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Vue recherche -->
+    <record id="view_suggestion_search" model="ir.ui.view">
+        <field name="name">gestion.suggestion.search</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher Suggestions">
+                <field name="name" string="Titre"/>
+                <field name="auteur_id"/>
+                <field name="responsable_id"/>
+                <field name="categorie"/>
+                <separator/>
+                <filter string="Mes suggestions" name="mes_suggestions" 
+                        domain="[('auteur_id', '=', uid)]"/>
+                <filter string="Suggestions assignées" name="assignees" 
+                        domain="[('responsable_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Brouillon" name="brouillon" 
+                        domain="[('state', '=', 'brouillon')]"/>
+                <filter string="Soumis" name="soumis" 
+                        domain="[('state', '=', 'soumis')]"/>
+                <filter string="En cours" name="en_cours" 
+                        domain="[('state', '=', 'en_cours')]"/>
+                <filter string="Accepté" name="accepte" 
+                        domain="[('state', '=', 'accepte')]"/>
+                <filter string="Refusé" name="refuse" 
+                        domain="[('state', '=', 'refuse')]"/>
+                <separator/>
+                <filter string="Haute priorité" name="haute_priorite" 
+                        domain="[('priorite', 'in', ['haute', 'urgente'])]"/>
+                <separator/>
+                <filter string="Date création" name="date_creation" 
+                        date="date_creation"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="État" name="group_state" 
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Auteur" name="group_auteur" 
+                            context="{'group_by': 'auteur_id'}"/>
+                    <filter string="Responsable" name="group_responsable" 
+                            context="{'group_by': 'responsable_id'}"/>
+                    <filter string="Catégorie" name="group_categorie" 
+                            context="{'group_by': 'categorie'}"/>
+                    <filter string="Priorité" name="group_priorite" 
+                            context="{'group_by': 'priorite'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue graphique -->
+    <record id="view_suggestion_graph" model="ir.ui.view">
+        <field name="name">gestion.suggestion.graph</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <graph string="Statistiques des Suggestions" type="bar">
+                <field name="state" type="row"/>
+                <field name="categorie" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vue pivot -->
+    <record id="view_suggestion_pivot" model="ir.ui.view">
+        <field name="name">gestion.suggestion.pivot</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des Suggestions">
+                <field name="state" type="row"/>
+                <field name="categorie" type="col"/>
+                <field name="cout_estime" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vue calendrier -->
+    <record id="view_suggestion_calendar" model="ir.ui.view">
+        <field name="name">gestion.suggestion.calendar</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <calendar string="Calendrier des Suggestions" 
+                      date_start="date_creation" 
+                      color="state"
+                      mode="month">
+                <field name="name"/>
+                <field name="auteur_id"/>
+                <field name="priorite"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Vue activité -->
+    <record id="view_suggestion_activity" model="ir.ui.view">
+        <field name="name">gestion.suggestion.activity</field>
+        <field name="model">gestion.suggestion</field>
+        <field name="arch" type="xml">
+            <activity string="Suggestions">
+                <templates>
+                    <div t-name="activity-box">
+                        <img t-att-src="activity_image('gestion.suggestion', 'image_128', record.id.raw_value)" 
+                             role="img" t-att-title="record.id.value" t-att-alt="record.id.value"/>
+                        <div>
+                            <field name="name" display="full"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+
+    <!-- Action principale -->
+    <record id="action_suggestion" model="ir.actions.act_window">
+        <field name="name">Suggestions</field>
+        <field name="res_model">gestion.suggestion</field>
+        <field name="view_mode">kanban,tree,form,graph,pivot,calendar,activity</field>
+        <field name="search_view_id" ref="view_suggestion_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première suggestion
+            </p>
+            <p>
+                Cliquez sur le bouton "Créer" pour ajouter une nouvelle suggestion.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action : Mes suggestions -->
+    <record id="action_mes_suggestions" model="ir.actions.act_window">
+        <field name="name">Mes Suggestions</field>
+        <field name="res_model">gestion.suggestion</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('auteur_id', '=', uid)]</field>
+        <field name="context">{'search_default_mes_suggestions': 1}</field>
+    </record>
+
+    <!-- Action : Suggestions à traiter -->
+    <record id="action_suggestions_a_traiter" model="ir.actions.act_window">
+        <field name="name">Suggestions à Traiter</field>
+        <field name="res_model">gestion.suggestion</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('responsable_id', '=', uid), ('state', 'in', ['soumis', 'en_cours'])]</field>
+        <field name="context">{'search_default_assignees': 1}</field>
+    </record>
+
+    <!-- Action : Suggestions acceptées -->
+    <record id="action_suggestions_acceptees" model="ir.actions.act_window">
+        <field name="name">Suggestions Acceptées</field>
+        <field name="res_model">gestion.suggestion</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('state', '=', 'accepte')]</field>
+        <field name="context">{'search_default_accepte': 1}</field>
+    </record>
+
+    <!-- Action : Statistiques -->
+    <record id="action_suggestion_statistics" model="ir.actions.act_window">
+        <field name="name">Statistiques des Suggestions</field>
+        <field name="res_model">gestion.suggestion</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="context">{
+            'group_by': ['state', 'categorie']
+        }</field>
+    </record>
+
+</odoo>
